@@ -14,6 +14,7 @@ const navItems = [
   { path: '/game', label: 'Aviator', icon: Flame },
   { path: '/deposit', label: 'Deposit', icon: PiggyBank },
   { path: '/withdraw', label: 'Withdraw', icon: CreditCard },
+  { path: '/support', label: 'Support', icon: Headphones },
   { path: '/refer-earn', label: 'Refer', icon: Gift },
   { path: '/transactions', label: 'History', icon: ArrowLeftRight },
   { path: '/manage-account', label: 'Bank', icon: TrendingUp },

@@ -13,6 +13,7 @@ import ReferEarn from './pages/private/ReferEarn';
 import ManageAccount from './pages/private/ManageAccount';
 import Transactions from './pages/private/Transactions';
 import Profile from './pages/private/Profile';
+import Support from './pages/private/Support';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/manage-account" element={<PrivateRoute><Layout><ManageAccount /></Layout></PrivateRoute>} />
       <Route path="/transactions" element={<PrivateRoute><Layout><Transactions /></Layout></PrivateRoute>} />
       <Route path="/profile" element={<PrivateRoute><Layout><Profile /></Layout></PrivateRoute>} />
+      <Route path="/support" element={<PrivateRoute><Layout><Support /></Layout></PrivateRoute>} />
 
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />

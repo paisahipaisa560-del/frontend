@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Smartphone, Gift, Gamepad2, Save } from 'lucide-react';
+import { Settings, Smartphone, Gift, Gamepad2, Save, Headphones, MessageCircle, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 
@@ -7,7 +7,8 @@ export default function AdminSettings() {
   const [payment, setPayment] = useState({ upiId: '', qrCode: '' });
   const [bonus, setBonus] = useState(50);
   const [speed, setSpeed] = useState(0.015);
-  const [loading, setLoading] = useState({ payment: false, bonus: false, game: false });
+  const [support, setSupport] = useState({ telegram: '', whatsapp: '' });
+  const [loading, setLoading] = useState({ payment: false, bonus: false, game: false, support: false });
 
   useEffect(() => {
     api.get('/admin/payment-settings').then(({ data }) => {
@@ -18,6 +19,11 @@ export default function AdminSettings() {
     api.get('/admin/game-settings').then(({ data }) => {
       if (data.success && data.data && typeof data.data.speed === 'number') {
         setSpeed(data.data.speed);
+      }
+    }).catch(() => {});
+    api.get('/support').then(({ data }) => {
+      if (data.success && data.data) {
+        setSupport({ telegram: data.data.telegram || '', whatsapp: data.data.whatsapp || '' });
       }
     }).catch(() => {});
   }, []);
@@ -44,6 +50,17 @@ export default function AdminSettings() {
     finally { setLoading(p => ({ ...p, bonus: false })); }
   };
 
+  const saveSupport = async (e) => {
+    e.preventDefault();
+    setLoading(p => ({ ...p, support: true }));
+    try {
+      const { data } = await api.put('/admin/support-settings', support);
+      if (data.success) toast.success('Support settings saved!');
+      else toast.error(data.message);
+    } catch { toast.error('Failed'); }
+    finally { setLoading(p => ({ ...p, support: false })); }
+  };
+
   const saveGame = async (e) => {
     e.preventDefault();
     const parsed = parseFloat(speed);
@@ -66,7 +83,7 @@ export default function AdminSettings() {
         <h1 className="text-lg font-bold">Settings</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* Payment */}
         <div className="glass-card rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -114,6 +131,31 @@ export default function AdminSettings() {
             <button type="submit" disabled={loading.game}
               className="btn-neon w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
               <Save size={13} /> {loading.game ? 'Saving...' : 'Save Speed'}
+            </button>
+          </form>
+        </div>
+
+        {/* Support */}
+        <div className="glass-card rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Headphones size={16} className="text-neon-green" />
+            <h3 className="text-white text-xs font-bold uppercase tracking-wider">Support Links</h3>
+          </div>
+          <form onSubmit={saveSupport} className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Send size={14} className="text-blue-400 shrink-0" />
+              <input type="text" value={support.telegram} onChange={e => setSupport(p => ({ ...p, telegram: e.target.value }))}
+                placeholder="Telegram username or link" className="input-neon rounded-lg px-3 py-2.5 text-xs flex-1" />
+            </div>
+            <div className="flex items-center gap-2">
+              <MessageCircle size={14} className="text-green-400 shrink-0" />
+              <input type="text" value={support.whatsapp} onChange={e => setSupport(p => ({ ...p, whatsapp: e.target.value }))}
+                placeholder="WhatsApp number (with country code)" className="input-neon rounded-lg px-3 py-2.5 text-xs flex-1" />
+            </div>
+            <p className="text-gray-600 text-[10px]">Telegram: username or full URL. WhatsApp: full number with country code (e.g. 919876543210)</p>
+            <button type="submit" disabled={loading.support}
+              className="btn-neon w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
+              <Save size={13} /> {loading.support ? 'Saving...' : 'Save Support'}
             </button>
           </form>
         </div>

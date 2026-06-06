@@ -658,7 +658,7 @@ export default function AviatorGame() {
 
   const placeBet = async () => {
     const amt = parseFloat(bet.amount);
-    if (!amt || amt < 100) return toast.error('Minimum bet is ₹100');
+    if (!amt || amt < 10) return toast.error('Minimum bet is ₹10');
     if (amt > parseFloat(user?.balance || 0)) return toast.error('Insufficient balance');
 
     const autoCashout = bet.autoCashout ? parseFloat(bet.autoCashout) : null;
@@ -1116,18 +1116,18 @@ export default function AviatorGame() {
             <label className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 block font-orbitron">Bet Amount</label>
             <div className="flex items-center gap-1">
               <button
-                onClick={() => setBet(prev => ({ ...prev, amount: Math.max(1, (parseFloat(prev.amount) || 100) - 100) }))}
+                onClick={() => setBet(prev => ({ ...prev, amount: Math.max(10, (parseFloat(prev.amount) || 100) - 100) }))}
                 disabled={isBetActive || gameState === 'crashed' || gameState === 'flying'}
                 className="btn-dark w-8 h-9 rounded-lg flex items-center justify-center text-base font-bold shrink-0 disabled:opacity-30"
               >−</button>
               <input
                 type="number"
                 value={bet.amount}
-                readOnly
+                onChange={e => setBet(prev => ({ ...prev, amount: e.target.value }))}
                 placeholder="Amount"
-                min="1"
+                min="10"
                 disabled={isBetActive || gameState === 'crashed' || gameState === 'flying'}
-                className="input-neon flex-1 rounded-lg px-3 py-2 text-sm text-center font-orbitron cursor-default"
+                className="input-neon flex-1 rounded-lg px-3 py-2 text-sm text-center font-orbitron"
               />
               <button
                 onClick={() => setBet(prev => ({ ...prev, amount: (parseFloat(prev.amount) || 100) + 100 }))}
