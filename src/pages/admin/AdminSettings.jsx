@@ -15,6 +15,11 @@ export default function AdminSettings() {
         setPayment({ upiId: data.data.upi_id || '', qrCode: data.data.qr_code || '' });
       }
     }).catch(() => {});
+    api.get('/admin/game-settings').then(({ data }) => {
+      if (data.success && data.data && typeof data.data.speed === 'number') {
+        setSpeed(data.data.speed);
+      }
+    }).catch(() => {});
   }, []);
 
   const savePayment = async (e) => {
@@ -41,12 +46,16 @@ export default function AdminSettings() {
 
   const saveGame = async (e) => {
     e.preventDefault();
+    const parsed = parseFloat(speed);
+    if (isNaN(parsed) || parsed < 0) return toast.error('Enter a valid non-negative speed');
     setLoading(p => ({ ...p, game: true }));
     try {
-      const { data } = await api.put('/admin/game-settings', { speed: parseFloat(speed) });
-      if (data.success) toast.success('Game settings updated!');
-      else toast.error(data.message);
-    } catch { toast.error('Failed'); }
+      const { data } = await api.put('/admin/game-settings', { speed: parsed });
+      if (data.success) {
+        if (data.data && typeof data.data.speed === 'number') setSpeed(data.data.speed);
+        toast.success('Game speed updated!');
+      } else toast.error(data.message);
+    } catch { toast.error('Failed to save game speed'); }
     finally { setLoading(p => ({ ...p, game: false })); }
   };
 
