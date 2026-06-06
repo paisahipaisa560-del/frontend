@@ -138,7 +138,7 @@ export default function LivePlayersTable({ visible = 8 }) {
             animate={{ scale: 1, opacity: 1 }}
             className="text-[10px] font-orbitron text-gray-400"
           >
-            <span className="text-neon-green font-bold"><CountUp value={totalBets} /></span>
+            <span className="text-neon-green font-bold"><CountUp value={totalBets} duration={2500} /></span>
             <span className="text-gray-600"> Bets</span>
           </motion.div>
           <div className="w-px h-3 bg-white/10" />
@@ -148,7 +148,7 @@ export default function LivePlayersTable({ visible = 8 }) {
             animate={{ scale: 1, opacity: 1 }}
             className="text-[10px] font-orbitron text-gray-400"
           >
-            <span className="text-yellow-400 font-bold">₹<CountUp value={totalWin} /></span>
+            <span className="text-yellow-400 font-bold">₹<CountUp value={totalWin} duration={2500} /></span>
             <span className="text-gray-600"> Won</span>
           </motion.div>
         </div>
