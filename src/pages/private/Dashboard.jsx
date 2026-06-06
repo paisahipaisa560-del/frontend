@@ -1,40 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Wallet, Copy, Check, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, Flame, Plane } from 'lucide-react';
+import { Wallet, Copy, Check, TrendingUp, TrendingDown, Plane } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardSkeleton } from '../../components/ui/Skeleton';
 import LivePlayersTable from '../../components/LivePlayersTable';
 
-const typeLabels = {
-  deposit: 'Deposit',
-  withdrawal: 'Withdrawal',
-  bet: 'Bet Placed',
-  bet_win: 'Game Win',
-  bet_loss: 'Game Loss',
-  referral_bonus: 'Referral Bonus',
-  daily_bonus: 'Daily Bonus',
-  admin_adjustment: 'Adjustment',
-  withdrawal_approved: 'Withdrawal',
-  withdrawal_rejected: 'Refunded',
-  deposit_rejected: 'Deposit Failed',
-};
-
 export default function Dashboard() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [balance, setBalance] = useState(user?.balance || 0);
   const [copied, setCopied] = useState(false);
-  const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/user/balance').then(({ data }) => data.success && setBalance(data.data.balance)),
-      api.get('/transactions?limit=8').then(({ data }) => data.success && setTxns(data.data))
-    ]).catch(() => {}).finally(() => setLoading(false));
+    api.get('/user/balance').then(({ data }) => data.success && setBalance(data.data.balance))
+      .catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const copyCode = () => {
@@ -110,44 +93,7 @@ export default function Dashboard() {
       {/* Live Players Table */}
       <LivePlayersTable visible={8} />
 
-      {/* My Wallet Activity */}
-      <div className="glass-card rounded-2xl p-3">
-        <div className="flex items-center gap-1.5 mb-2">
-          <Flame size={14} className="text-neon-green" />
-          <span className="text-white text-xs font-bold uppercase tracking-wider">My Wallet Activity</span>
-        </div>
-        {txns.length === 0 ? (
-          <p className="text-gray-600 text-xs text-center py-6">No activity yet</p>
-        ) : (
-          <div className="space-y-1.5">
-            {txns.map((t, i) => (
-              <div key={t.id || i} className="glass rounded-xl px-3 py-2.5 flex items-center justify-between">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    t.type === 'deposit' || t.type === 'bet_win' || t.type === 'referral_bonus' || t.type === 'daily_bonus'
-                      ? 'bg-neon-green/10' : 'bg-red-500/10'
-                  }`}>
-                    {t.type === 'deposit' || t.type === 'bet_win' || t.type === 'referral_bonus' || t.type === 'daily_bonus'
-                      ? <ArrowDownLeft size={14} className="text-neon-green" />
-                      : <ArrowUpRight size={14} className="text-red-400" />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-white text-xs font-medium truncate">{typeLabels[t.type] || t.type}</p>
-                    <p className="text-gray-600 text-[10px]">{new Date(t.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                </div>
-                <p className={`font-orbitron text-xs font-bold flex-shrink-0 ml-2 ${
-                  t.type === 'deposit' || t.type === 'bet_win' || t.type === 'referral_bonus' || t.type === 'daily_bonus'
-                    ? 'text-neon-green' : 'text-red-400'
-                }`}>
-                  {t.type === 'deposit' || t.type === 'bet_win' || t.type === 'referral_bonus' || t.type === 'daily_bonus' ? '+' : '-'}
-                  ₹{parseFloat(t.amount).toLocaleString('en-IN')}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+
     </div>
   );
 }
