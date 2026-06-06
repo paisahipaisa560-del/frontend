@@ -107,9 +107,8 @@ export default function LivePlayersTable({ visible = 8 }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const batchSize = randInt(1, 3);
-      for (let i = 0; i < batchSize; i++) setTimeout(addPlayer, i * 200);
-    }, randInt(1800, 4000));
+      addPlayer();
+    }, randInt(2200, 3800));
     return () => clearInterval(interval);
   }, [addPlayer]);
 
