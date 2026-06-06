@@ -8,10 +8,11 @@ import { AviatorSkeleton } from '../../components/ui/Skeleton';
 
 const MAX_MULTIPLIER = 50;
 const FAKE_NAMES = [
-  'Rajesh', 'Priya', 'Amit', 'Neha', 'Vikram', 'Ananya', 'Rahul', 'Kavita',
-  'Suresh', 'Divya', 'Deepak', 'Pooja', 'Manish', 'Ritu', 'Arjun', 'Shreya',
-  'Rohit', 'Tanvi', 'Akash', 'Meera', 'Vivek', 'Isha', 'Karan', 'Naina',
-  'Sanjay', 'Anjali', 'Harsh', 'Riya', 'Gaurav', 'Sakshi'
+  '1***4', '1***f', '1***5', '2***k', '8***p', '7***m',
+  '3***r', '9***x', '4***z', '0***t', '5***h', '6***v',
+  'k***7', 'x***2', 'j***9', 'p***3', 'm***8', 'n***1',
+  'r***6', 't***0', 'v***4', 'w***5', 's***3', 'l***2',
+  'h***7', 'b***9', 'g***0', 'd***5', 'f***1', 'c***6'
 ];
 
 function rand(min, max) { return Math.random() * (max - min) + min; }
@@ -365,22 +366,32 @@ const QUICK_AMOUNTS = [100, 500, 1000, 5000];
 
 // ====== FAKE PLAYERS ======
 let fakeActivityId = 0;
+const FAKE_AVATARS = [
+  '#39FF14', '#FF6B6B', '#6BCBFF', '#FFD93D', '#FF8E53', '#A66CFF',
+  '#FF6B6B', '#39FF14', '#FFD93D', '#6BCBFF', '#FF8E53', '#A66CFF',
+  '#FF4444', '#FFD700', '#39FF14', '#FF6B6B', '#6BCBFF', '#A66CFF',
+  '#FFD93D', '#FF8E53', '#FF4444', '#39FF14', '#FFD700', '#6BCBFF',
+  '#FF6B6B', '#A66CFF', '#FF8E53', '#39FF14', '#FFD700', '#FF4444',
+];
 function generateFakeActivity(multiplier, state) {
-  const name = pick(FAKE_NAMES);
+  const idx = Math.floor(Math.random() * FAKE_NAMES.length);
+  const name = FAKE_NAMES[idx];
+  const avatarColor = FAKE_AVATARS[idx];
   const amt = Math.round(rand(100, 5000));
+  const avatarUrl = `https://api.dicebear.com/7.x/identicon/png?seed=${name}&size=16`;
   if (state === 'flying') {
     const cashMult = parseFloat((1 + rand(0.1, Math.max(0.5, multiplier - 0.5))).toFixed(2));
     const win = Math.round(amt * cashMult);
     const actions = [
-      { icon: '🟢', text: `${name} cashed out at ${cashMult.toFixed(2)}x & won ₹${win.toLocaleString('en-IN')}`, type: 'win' },
-      { icon: '🟡', text: `${name} bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet' },
+      { avatarUrl, name, text: `cashed out at ${cashMult.toFixed(2)}x & won ₹${win.toLocaleString('en-IN')}`, type: 'win', avatarColor },
+      { avatarUrl, name, text: `bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet', avatarColor },
     ];
     return { ...pick(actions), id: ++fakeActivityId };
   }
   if (state === 'crashed') {
-    return { icon: '🔴', text: `${name} lost ₹${amt.toLocaleString('en-IN')}`, type: 'loss', id: ++fakeActivityId };
+    return { avatarUrl, name, text: `lost ₹${amt.toLocaleString('en-IN')}`, type: 'loss', avatarColor, id: ++fakeActivityId };
   }
-  return { icon: '🟡', text: `${name} bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet', id: ++fakeActivityId };
+  return { avatarUrl, name, text: `bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet', avatarColor, id: ++fakeActivityId };
 }
 
 export default function AviatorGame() {
@@ -1050,7 +1061,7 @@ export default function AviatorGame() {
               {fakeActivity.map((a, i) => (
                 <div
                   key={a.id}
-                  className={`text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md mb-0.5 truncate ${
+                  className={`flex items-center gap-1 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md mb-0.5 truncate ${
                     a.type === 'win'
                       ? 'bg-green-500/5 text-green-300'
                       : a.type === 'loss'
@@ -1058,8 +1069,9 @@ export default function AviatorGame() {
                       : 'bg-white/5 text-gray-400'
                   }`}
                 >
-                  <span className="mr-0.5">{a.icon}</span>
-                  {a.text}
+                  <img src={a.avatarUrl} alt="" className="w-3.5 h-3.5 rounded-full shrink-0" />
+                  <span className="font-semibold shrink-0">{a.name}</span>
+                  <span className="truncate">{a.text}</span>
                 </div>
               ))}
             </div>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Gamepad2, PiggyBank, LogOut, Gift, CreditCard,
   ArrowLeftRight, User, TrendingUp, ChevronDown, Copy, Check, Menu, X,
-  Wallet, CircleDollarSign, Flame, Crown
+  Wallet, CircleDollarSign, Flame, Crown, Headphones, Eye
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import api from '../lib/api';
@@ -116,19 +116,21 @@ export default function Layout({ children }) {
 
       {/* MOBILE HEADER */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-solid">
-        <div className="flex items-center justify-between h-14 px-4">
+        <div className="flex items-center justify-between h-14 px-3">
           <button onClick={() => setSidebarOpen(true)} className="btn-dark p-2 rounded-lg">
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <Flame size={16} className="text-neon-green" />
-            <span className="font-orbitron text-neon-green text-sm font-bold">PHP</span>
-          </div>
-          <div className="balance-badge rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-            <Wallet size={14} className="text-neon-green" />
-            <span className="font-orbitron text-neon-green text-xs font-bold">
-              ₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-            </span>
+            <button onClick={() => window.open('https://t.me/paisahipaisa', '_blank')} className="btn-dark flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px]">
+              <Headphones size={14} className="text-neon-green" />
+              <span className="text-gray-300 font-medium">Support</span>
+            </button>
+            <div className="balance-badge rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+              <Wallet size={14} className="text-neon-green" />
+              <span className="font-orbitron text-neon-green text-xs font-bold">
+                ₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+              </span>
+            </div>
           </div>
         </div>
       </header>

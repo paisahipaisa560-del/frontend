@@ -54,10 +54,10 @@ export default function Dashboard() {
     <div className="p-2 md:p-3 space-y-2.5">
       {/* Welcome Card */}
       <div className="glass-card rounded-2xl p-4 neon-border">
-        <p className="text-gray-500 text-xs">Good to see you,</p>
+        <p className="text-gray-500 text-xs">Welcome to</p>
         <div className="flex items-center gap-2 mt-1 mb-0.5">
           <h1 className="text-xl md:text-2xl font-bold">
-            <span className="neon-text">{firstName}</span>
+            <span className="neon-text">Paisa Hi Paisa</span>
           </h1>
           <motion.div
             animate={{ y: [-3, 3, -3] }}
@@ -66,7 +66,7 @@ export default function Dashboard() {
             <Plane size={18} className="text-neon-green drop-shadow-[0_0_8px_rgba(57,255,20,0.4)]" />
           </motion.div>
         </div>
-        <p className="text-gray-500 text-xs">Ready to make this one count?</p>
+        <p className="text-gray-500 text-xs">Play smart. Win big. Fly high.</p>
       </div>
 
       {/* Banner */}
