@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Flame, UserPlus } from 'lucide-react';
@@ -8,7 +8,13 @@ import toast from 'react-hot-toast';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ fullName: '', email: '', mobile: '', password: '', confirmPassword: '', referralCode: '' });
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) setForm(p => ({ ...p, referralCode: ref }));
+  }, []);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
 
