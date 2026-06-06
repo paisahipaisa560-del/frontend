@@ -1121,11 +1121,15 @@ export default function AviatorGame() {
                 className="btn-dark w-8 h-9 rounded-lg flex items-center justify-center text-base font-bold shrink-0 disabled:opacity-30"
               >−</button>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={bet.amount}
-                onChange={e => setBet(prev => ({ ...prev, amount: e.target.value }))}
+                onChange={e => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  setBet(prev => ({ ...prev, amount: val }));
+                }}
                 placeholder="Amount"
-                min="10"
                 disabled={isBetActive || gameState === 'crashed' || gameState === 'flying'}
                 className="input-neon flex-1 rounded-lg px-3 py-2 text-sm text-center font-orbitron"
               />
