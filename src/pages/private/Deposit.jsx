@@ -29,7 +29,7 @@ export default function Deposit() {
 
   const handleProceed = () => {
     const amt = parseFloat(amount);
-    if (!amt || amt <= 0) return toast.error('Enter a valid amount');
+    if (!amt || amt < 100) return toast.error('Minimum deposit is ₹100');
     setStep('payment');
   };
 
@@ -96,9 +96,9 @@ export default function Deposit() {
                   ))}
                 </div>
                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
-                  placeholder="Enter custom amount" min="1"
+                  placeholder="Enter custom amount" min="100"
                   className="input-neon rounded-lg px-3 py-2.5 text-sm text-center mb-3" />
-                <button onClick={handleProceed} disabled={!parseFloat(amount) || parseFloat(amount) <= 0}
+                <button onClick={handleProceed} disabled={!parseFloat(amount) || parseFloat(amount) < 100}
                   className="btn-neon w-full py-3 rounded-xl text-sm font-bold">
                   Add Amount {'\u20B9'}{parseFloat(amount) > 0 ? parseFloat(amount).toLocaleString('en-IN') : ''}
                 </button>

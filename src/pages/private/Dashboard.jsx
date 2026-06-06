@@ -6,21 +6,7 @@ import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardSkeleton } from '../../components/ui/Skeleton';
-
-const liveActions = [
-  { phone: '+916291******08', type: 'withdrawn', amount: 23000 },
-  { phone: '+919876******45', type: 'deposited', amount: 5000 },
-  { phone: '+917845******12', type: 'withdrawn', amount: 12000 },
-  { phone: '+919623******78', type: 'deposited', amount: 8000 },
-  { phone: '+918765******90', type: 'withdrawn', amount: 45000 },
-  { phone: '+917890******34', type: 'deposited', amount: 15000 },
-  { phone: '+916543******56', type: 'withdrawn', amount: 6700 },
-  { phone: '+919012******23', type: 'deposited', amount: 32000 },
-  { phone: '+918888******11', type: 'withdrawn', amount: 5600 },
-  { phone: '+917777******22', type: 'deposited', amount: 11000 },
-  { phone: '+916666******33', type: 'withdrawn', amount: 8900 },
-  { phone: '+915555******44', type: 'deposited', amount: 27000 },
-];
+import LivePlayersTable from '../../components/LivePlayersTable';
 
 const typeLabels = {
   deposit: 'Deposit',
@@ -41,7 +27,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(user?.balance || 0);
   const [copied, setCopied] = useState(false);
-  const [liveIndex, setLiveIndex] = useState(0);
   const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,11 +35,6 @@ export default function Dashboard() {
       api.get('/user/balance').then(({ data }) => data.success && setBalance(data.data.balance)),
       api.get('/transactions?limit=8').then(({ data }) => data.success && setTxns(data.data))
     ]).catch(() => {}).finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    const i = setInterval(() => setLiveIndex(p => (p + 1) % liveActions.length), 3000);
-    return () => clearInterval(i);
   }, []);
 
   const copyCode = () => {
@@ -67,10 +47,6 @@ export default function Dashboard() {
 
   const firstName = user?.full_name?.split(' ')[0] || 'User';
   const bal = parseFloat(balance);
-  const visibleLive = [];
-  for (let i = 0; i < 4; i++) {
-    visibleLive.push(liveActions[(liveIndex + i) % liveActions.length]);
-  }
 
   if (loading) return <DashboardSkeleton />;
 
@@ -131,31 +107,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Live Deposit/Withdraw Ticker */}
-      <div className="glass-card rounded-2xl p-3">
-        <div className="flex items-center gap-1.5 mb-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-          <span className="text-white text-xs font-bold uppercase tracking-wider">Live Transactions</span>
-        </div>
-        <div className="space-y-1.5">
-          {visibleLive.map((h, i) => (
-            <div key={i} className="glass rounded-xl px-3 py-2.5 flex items-center justify-between transition-all duration-500">
-              <div className="flex items-center gap-2.5">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${h.type === 'deposited' ? 'bg-neon-green/10' : 'bg-red-500/10'}`}>
-                  {h.type === 'deposited' ? <ArrowDownLeft size={14} className="text-neon-green" /> : <ArrowUpRight size={14} className="text-red-400" />}
-                </div>
-                <div>
-                  <p className="text-white text-xs font-medium">{h.phone}</p>
-                  <p className="text-gray-600 text-[10px]">{h.type === 'deposited' ? 'Deposited' : 'Withdrawn'}</p>
-                </div>
-              </div>
-              <p className={`font-orbitron text-xs font-bold ${h.type === 'deposited' ? 'text-neon-green' : 'text-red-400'}`}>
-                {h.type === 'deposited' ? '+' : '-'}₹{h.amount.toLocaleString('en-IN')}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Live Players Table */}
+      <LivePlayersTable visible={8} />
 
       {/* My Wallet Activity */}
       <div className="glass-card rounded-2xl p-3">

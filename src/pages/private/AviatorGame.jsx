@@ -629,8 +629,9 @@ export default function AviatorGame() {
       if (data.success && Array.isArray(data.data)) {
         const bets = data.data.slice(-10).reverse();
         setUserBets(bets);
+        const currentState = gameStateRef.current;
         for (const b of bets) {
-          if (b.status === 'pending') {
+          if (b.status === 'pending' && currentState === 'flying') {
             setBet(prev => prev.betId ? prev : { ...prev, betId: b.id, status: 'pending' });
           } else if (b.status === 'cashed_out') {
             setBet(prev => prev.betId === b.id ? { ...prev, status: 'cashed_out', payout: parseFloat(b.payout), cashoutMultiplier: parseFloat(b.cash_out_at) } : prev);
@@ -1163,15 +1164,15 @@ export default function AviatorGame() {
 
           {/* Right: Buttons */}
           <div className="w-full sm:w-auto flex gap-2">
-            {!isBetActive ? (
+            {gameState === 'waiting' && !isBetActive ? (
               <button
                 onClick={placeBet}
-                disabled={gameState === 'crashed' || gameState === 'flying' || !bet.amount || parseFloat(bet.amount) <= 0}
+                disabled={!bet.amount || parseFloat(bet.amount) <= 0}
                 className="btn-neon flex-1 sm:flex-none sm:min-w-[120px] py-2.5 px-6 rounded-lg text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
               >
-                {gameState === 'flying' ? 'Betting Closed' : 'Place Bet'}
+                Place Bet
               </button>
-            ) : bet.status === 'pending' && bet.autoCashout ? (
+            ) : !isBetActive ? null : bet.status === 'pending' && bet.autoCashout ? (
               <div className="flex-1 sm:flex-none text-center px-4 py-2">
                 <p className="text-gray-500 text-[10px] font-bold uppercase">Auto Target</p>
                 <p className="font-orbitron text-gray-400 text-sm">{parseFloat(bet.autoCashout).toFixed(2)}x</p>
