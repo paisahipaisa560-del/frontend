@@ -2,36 +2,36 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const FAKE_USERS = [
-  { name: '1***4', avatar: '🎲', color: '#39FF14' },
-  { name: '1***f', avatar: '♠️', color: '#FF6B6B' },
-  { name: '1***5', avatar: '🔮', color: '#6BCBFF' },
-  { name: '2***k', avatar: '♦️', color: '#FFD93D' },
-  { name: '8***p', avatar: '🎰', color: '#FF8E53' },
-  { name: '7***m', avatar: '♣️', color: '#A66CFF' },
-  { name: '3***r', avatar: '🎯', color: '#FF6B6B' },
-  { name: '9***x', avatar: '🃏', color: '#39FF14' },
-  { name: '4***z', avatar: '🎪', color: '#FFD93D' },
-  { name: '0***t', avatar: '🎱', color: '#6BCBFF' },
-  { name: '5***h', avatar: '💰', color: '#FF8E53' },
-  { name: '6***v', avatar: '💎', color: '#A66CFF' },
-  { name: 'k***7', avatar: '🔥', color: '#FF4444' },
-  { name: 'x***2', avatar: '⭐', color: '#FFD700' },
-  { name: 'j***9', avatar: '🎴', color: '#39FF14' },
-  { name: 'p***3', avatar: '👑', color: '#FF6B6B' },
-  { name: 'm***8', avatar: '💫', color: '#6BCBFF' },
-  { name: 'n***1', avatar: '🎲', color: '#A66CFF' },
-  { name: 'r***6', avatar: '♠️', color: '#FFD93D' },
-  { name: 't***0', avatar: '🔮', color: '#FF8E53' },
-  { name: 'v***4', avatar: '♦️', color: '#FF4444' },
-  { name: 'w***5', avatar: '🎰', color: '#39FF14' },
-  { name: 's***3', avatar: '♣️', color: '#FFD700' },
-  { name: 'l***2', avatar: '🎯', color: '#6BCBFF' },
-  { name: 'h***7', avatar: '🃏', color: '#FF6B6B' },
-  { name: 'b***9', avatar: '🎪', color: '#A66CFF' },
-  { name: 'g***0', avatar: '💰', color: '#FF8E53' },
-  { name: 'd***5', avatar: '💎', color: '#39FF14' },
-  { name: 'f***1', avatar: '🔥', color: '#FFD700' },
-  { name: 'c***6', avatar: '⭐', color: '#FF4444' },
+  { name: '1***4', color: '#39FF14' },
+  { name: '1***f', color: '#FF6B6B' },
+  { name: '1***5', color: '#6BCBFF' },
+  { name: '2***k', color: '#FFD93D' },
+  { name: '8***p', color: '#FF8E53' },
+  { name: '7***m', color: '#A66CFF' },
+  { name: '3***r', color: '#FF6B6B' },
+  { name: '9***x', color: '#39FF14' },
+  { name: '4***z', color: '#FFD93D' },
+  { name: '0***t', color: '#6BCBFF' },
+  { name: '5***h', color: '#FF8E53' },
+  { name: '6***v', color: '#A66CFF' },
+  { name: 'k***7', color: '#FF4444' },
+  { name: 'x***2', color: '#FFD700' },
+  { name: 'j***9', color: '#39FF14' },
+  { name: 'p***3', color: '#FF6B6B' },
+  { name: 'm***8', color: '#6BCBFF' },
+  { name: 'n***1', color: '#A66CFF' },
+  { name: 'r***6', color: '#FFD93D' },
+  { name: 't***0', color: '#FF8E53' },
+  { name: 'v***4', color: '#FF4444' },
+  { name: 'w***5', color: '#39FF14' },
+  { name: 's***3', color: '#FFD700' },
+  { name: 'l***2', color: '#6BCBFF' },
+  { name: 'h***7', color: '#FF6B6B' },
+  { name: 'b***9', color: '#A66CFF' },
+  { name: 'g***0', color: '#FF8E53' },
+  { name: 'd***5', color: '#39FF14' },
+  { name: 'f***1', color: '#FFD700' },
+  { name: 'c***6', color: '#FF4444' },
 ];
 
 function rand(min, max) { return Math.random() * (max - min) + min; }
@@ -185,7 +185,7 @@ export default function LivePlayersTable({ visible = 8 }) {
                     boxShadow: `0 0 8px ${player.user.color}20`,
                   }}
                 >
-                  <span className="drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">{player.user.avatar}</span>
+                  <img src={`https://api.dicebear.com/7.x/identicon/png?seed=${player.user.name}&size=28`} alt="" className="w-full h-full rounded-full" />
                 </div>
                 <span className="text-white text-xs font-medium truncate tracking-wide">{player.user.name}</span>
               </div>
