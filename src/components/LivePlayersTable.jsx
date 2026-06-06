@@ -115,7 +115,7 @@ export default function LivePlayersTable({ visible = 8 }) {
 
   const getRowStyle = (player) => {
     if (player.isHighMultiplier) {
-      return 'border-l-2 border-yellow-400/60 bg-gradient-to-r from-yellow-500/8 to-transparent shadow-[0_0_15px_rgba(255,215,0,0.06)]';
+      return 'border-l-2 border-neon-green/60 bg-gradient-to-r from-neon-green/10 to-transparent shadow-[0_0_15px_rgba(57,255,20,0.08)]';
     }
     if (player.result === 'win') {
       return 'border-l-2 border-green-400/40 bg-gradient-to-r from-green-500/5 to-transparent';
@@ -148,7 +148,7 @@ export default function LivePlayersTable({ visible = 8 }) {
             animate={{ scale: 1, opacity: 1 }}
             className="text-[10px] font-orbitron text-gray-400"
           >
-            <span className="text-yellow-400 font-bold">₹{totalWin.toLocaleString('en-IN')}</span>
+            <span className="text-neon-green font-bold">₹{totalWin.toLocaleString('en-IN')}</span>
             <span className="text-gray-600"> Won</span>
           </motion.div>
         </div>
@@ -202,7 +202,7 @@ export default function LivePlayersTable({ visible = 8 }) {
                 {player.result === 'win' ? (
                   <span className={`text-[11px] font-orbitron font-bold ${
                     player.isHighMultiplier
-                      ? 'text-yellow-400 drop-shadow-[0_0_6px_rgba(255,215,0,0.3)]'
+                      ? 'text-neon-green drop-shadow-[0_0_6px_rgba(57,255,20,0.3)]'
                       : 'text-neon-green'
                   }`}>
                     {player.multiplier.toFixed(2)}x
@@ -221,7 +221,7 @@ export default function LivePlayersTable({ visible = 8 }) {
                     transition={{ type: 'spring', damping: 15, stiffness: 200 }}
                     className={`text-[11px] font-orbitron font-bold ${
                       player.isHighMultiplier
-                        ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]'
+                        ? 'text-neon-green drop-shadow-[0_0_8px_rgba(57,255,20,0.3)]'
                         : 'text-neon-green'
                     }`}
                   >
