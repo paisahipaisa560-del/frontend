@@ -126,11 +126,11 @@ export default function Deposit() {
                       <span className="text-white text-xs font-bold uppercase tracking-wider">Scan & Pay</span>
                     </div>
                     {qrDataUrl ? (
-                      <div className="relative inline-block">
+                      <div>
                         <img src={qrDataUrl} alt="UPI QR Code" className="mx-auto rounded-xl" style={{ width: 170, height: 170 }} />
                         <a href={qrDataUrl} download={`qr-${payment?.upi_id || 'upi'}.png`}
-                          className="absolute -top-2 -right-2 btn-dark p-1.5 rounded-lg text-[10px] flex items-center gap-1">
-                          <Download size={12} /> Save
+                          className="btn-dark inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] mt-2">
+                          <Download size={12} /> Save QR
                         </a>
                       </div>
                     ) : (
