@@ -152,7 +152,7 @@ export default function Deposit() {
                       <Hash size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                       <input type="text" value={utr} onChange={e => setUtr(e.target.value)}
                         placeholder="Enter UTR number from transaction"
-                        className="input-neon rounded-lg px-3 py-2.5 text-sm pl-9" />
+                        className="input-neon rounded-lg px-3 py-2.5 text-sm pl-10" />
                     </div>
                     <p className="text-gray-600 text-[10px] mt-1">UTR is on your bank statement or SMS after payment</p>
                   </div>
