@@ -26,7 +26,7 @@ export default function Deposit() {
 
   useEffect(() => {
     if (payment?.upi_id) {
-      const upiLink = `upi://pay?pa=${encodeURIComponent(payment.upi_id)}&pn=Paisa%20Hi%20Paisa&cu=INR`;
+      const upiLink = `upi://pay?pa=${encodeURIComponent(payment.upi_id)}&cu=INR`;
       QRCode.toDataURL(upiLink, {
         width: 300,
         margin: 1,
