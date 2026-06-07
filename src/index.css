@@ -3,13 +3,19 @@
 @tailwind utilities;
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { overflow-x: hidden; max-width: 100vw; }
+#root { overflow-x: hidden; max-width: 100vw; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
   background: #000000;
   color: #ffffff;
   min-height: 100vh;
   overflow-x: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100vw;
 }
 
 .font-orbitron { font-family: 'Orbitron', monospace; }
@@ -180,8 +186,205 @@ body {
 .animate-in:nth-child(5) { animation-delay: 0.25s; }
 .animate-in:nth-child(6) { animation-delay: 0.3s; }
 
-.aviator-bg {
-  background: linear-gradient(180deg, #000000 0%, #050a05 40%, #000000 100%);
+/* ===== REFERENCE AVIATOR UI ===== */
+.game-play { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; overflow-y: hidden; padding: 0 10px 10px; max-width: 100%; }
+.result-history { min-height: 22px; max-height: 22px; margin: 10px 0; display: flex; justify-content: center; align-items: center; }
+.result-history .stats { height: 22px; width: 100%; display: flex; align-items: center; position: relative; padding: 0 5px; font-size: 12px; }
+.result-history .stats .payouts-wrapper { display: flex; align-items: center; height: 100%; width: 100%; overflow: hidden; }
+.result-history .stats .payouts-wrapper .payouts-block { display: flex; }
+.result-history .stats .payouts-wrapper .payouts-block .payout { display: flex; margin-right: 4px; margin-left: 1px; position: relative; z-index: 1; cursor: pointer; }
+.result-history .stats .payouts-wrapper .payouts-block .payout .item { padding: 2px 11px; border-radius: 11px; background-color: #00000080; font-weight: 700 !important; font-size: 12px; }
+.result-history .stats .payouts-wrapper .payouts-block .payout .item.blue { color: rgb(52, 180, 255); }
+.result-history .stats .payouts-wrapper .payouts-block .payout .item.purple { color: rgb(145, 62, 248); }
+.result-history .stats .payouts-wrapper .payouts-block .payout .item.big { color: rgb(192, 23, 180); }
+.result-history .stats .button-block { height: 100%; width: 52px; z-index: 101; }
+.result-history .stats .button-block .button { margin-left: 6px; position: relative; z-index: 9; display: flex; align-items: center; justify-content: center; width: 46px; height: 22px; border-radius: 13px; border: solid 1px #414148; background: #252528; cursor: pointer; }
+.result-history .stats .button-block .button .trigger { display: flex; align-items: center; justify-content: center; }
+
+.stage-board { height: 100%; position: relative; }
+.stage-board .play-board-wrapper { width: 100%; height: 100%; position: absolute; z-index: 0; }
+.stage-board .play-board-wrapper .stage-canvas { position: absolute; width: 100%; height: 100%; border-radius: 20px; border: 1px solid #2A2B2E; overflow: hidden; }
+
+.crash-text-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 2; }
+.crashtext { width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 100px; font-weight: 700; color: white; }
+.crashtext .flew-away { color: white; font-size: 40px; margin-top: 25px; }
+.crashtext.red { color: red !important; }
+@media (max-width: 1314px) { .crashtext { font-size: 60px; } .crashtext .flew-away { font-size: 25px; margin-top: 15px; } }
+.crashtext .waiting-font { font-size: 22px; font-weight: 400; margin-top: 15px; color: #fff; }
+@media (max-width:414px) { .crashtext .waiting-font { font-size: 18px; } .crashtext .flew-away { font-size: 18px; } }
+
+.waiting-bar { margin-top: 10px; width: 250px; background-color: rgb(138, 138, 138); border-radius: 8px; height: 6px; overflow: hidden; }
+.waiting-bar div { background-color: rgb(190, 13, 13); height: 100%; border-radius: 8px; transition: width 0.3s ease-in-out; min-width: 0; }
+@media (max-width:560px) { .waiting-bar { width: 200px; } }
+
+.rotate { animation: rotate 1.5s linear infinite; display: flex; align-items: center; justify-content: center; width: 150px; height: 150px; margin-bottom: 10px; }
+@media (max-width:1400px) { .rotate { width: 80px; height: 80px; margin-bottom: 5px; } }
+@keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.bet-controls { display: flex; justify-content: center; flex-shrink: 0; padding-top: 10px; width: 100%; }
+.bet-controls .controls { display: flex; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 100%; overflow: hidden; }
+.bet-controls .controls .bet-control { width: 100%; height: 170px; max-width: 750px; min-width: 280px; border-radius: 20px; position: relative; margin-right: 5px; }
+@media (max-width: 360px) { .bet-controls .controls .bet-control { min-width: 0; } }
+.bet-controls .controls .bet-control .controls { display: flex; position: relative; width: 100%; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; background-color: #1b1c1d; height: 100%; margin: 0 auto; border: solid 1px transparent; }
+.bet-controls .controls .bet-control .controls .navigation { height: 24px; font-size: 12px; margin-bottom: auto; margin-top: 10px; }
+.bet-controls .controls .bet-control .controls .navigation .navigation-switcher { height: 100%; background: #141516; border-radius: 10px; border: solid 1px #141516; position: relative; display: flex; }
+.bet-controls .controls .bet-control .controls .navigation .navigation-switcher button { height: 100%; position: relative; text-align: center; background: none; border: none; color: #9ea0a3; padding: 0 12px; cursor: pointer; font-size: 12px; white-space: nowrap; }
+.bet-controls .controls .bet-control .controls .navigation .navigation-switcher button.active { color: white; background: rgb(44, 45, 48); border-radius: 10px; }
+.bet-controls .controls .bet-control .controls .first-row { width: calc(100% - 20px); max-width: 390px; display: flex; justify-content: center; margin: 0 auto auto; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; width: 140px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner { height: 34px; font-size: 18px; width: 100%; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner { height: 100%; display: flex; justify-content: space-between; align-items: center; border-radius: 22px; background-color: #000000b3; font-weight: 700; font-size: inherit; line-height: 1; padding-left: 10px; padding-right: 10px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner.disabled { background-color: #131313b3 !important; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .buttons { display: inline-flex; align-items: center; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .buttons button { margin: 0; padding: 0; border: none; width: 18px; height: 18px; cursor: pointer; min-width: 18px; min-height: 18px; text-align: center; line-height: 16px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .buttons .minus { background: transparent url(./assets/images/minus.svg) no-repeat center center; background-size: 10px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .buttons .plus { background: transparent url(./assets/images/plus.svg) no-repeat center center; background-size: 10px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .input { display: flex; align-items: center; width: calc(100% - 35px); height: 100%; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .input input { width: 100%; border: 0; background: transparent; color: #fff; text-align: center; padding: 0; font-weight: 700; outline: none; font-size: 16px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-opt-list { display: flex; justify-content: center; flex-wrap: wrap; font-size: 14px; color: #9ea0a3; width: 100%; margin-top: 4px; gap: 4px; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-opt-list .bet-opt { font-size: 14px; width: 64px; height: 18px; line-height: 1; padding: 0; background: #141516; border: none; cursor: pointer; border-radius: 100px; background-color: #252528; color: #83878e; text-align: center; }
+.bet-controls .controls .bet-control .controls .first-row .bet-block .bet-opt-list .bet-opt.disabled { opacity: 0.4; cursor: default; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block { width: calc(100% - 145px); margin-left: 5px; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block .btn-tooltip { font-size: 14px; color: #ffffffb3; text-align: center; margin-bottom: 4px; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block button { width: 100%; height: 100%; min-height: 60px; font-size: 20px; cursor: pointer; border-radius: 20px; border: none; padding: 8px; display: flex; align-items: center; justify-content: center; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block button span { display: flex; justify-content: center; flex-direction: column; align-items: center; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block button span label { margin: 0; line-height: 1; cursor: pointer; text-transform: uppercase !important; display: inherit; font-size: 14px; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block button span label.amount { font-size: 24px; margin-top: 2px; }
+.bet-controls .controls .bet-control .controls .first-row .buttons-block button span label.amount .currency { font-size: 18px; }
+.bet-controls .controls .bet-control .controls .border-line { height: 2px; background: #141516; width: 100% !important; margin-top: auto; }
+
+.btn-success { border: solid 1px #b2f2a3; background-color: #28a909; box-shadow: inset 0 1px 1px #ffffff80; color: #fff; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.btn-primary { border: solid 1px #46c0f2; border-radius: 17px; background-color: #1d7aca; color: #fff; text-align: center; box-shadow: none; font-size: 12px; }
+.btn-waiting { border: solid 1px #ffbd71; background-color: #d07206; box-shadow: inset 0 1px 1px #ffffff80; color: #fff; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.btn-danger { border: solid 1px #ff7171; background-color: #cb011a; box-shadow: inset 0 1px 1px #ffffff80; color: #fff; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.btn-secondary { border: 1px solid #36363C; border-radius: 100px; background-color: #252528; color: #83878e; text-align: center; box-shadow: none; cursor: pointer; padding: 3px 10px; font-size: 12px; }
+
+.auto-bet-wrapper .auto-bet { font-size: 12px; text-align: center; display: flex; align-items: center; }
+.auto-bet-wrapper .auto-bet .auto-play-btn { height: 22px; width: 100px; border-radius: 17px; padding: 0; font-size: 12px; cursor: pointer; border: none; color: #fff; }
+.cashout-block { display: flex; align-items: center; justify-content: space-between; margin: 0 5px; }
+.cashout-block .cashout-switcher { width: 100%; display: flex; align-items: center; justify-content: center; }
+.cashout-block .cashout-switcher .label { font-size: 12px; margin: 0 5px 0 0; text-align: center; color: #9ea0a3; }
+.input-switch { display: flex; align-items: center; cursor: pointer; position: relative; -webkit-user-select: none; user-select: none; padding: 0 2px; justify-content: flex-end; width: 36px; height: 18px; border-radius: 9px; border: solid 1px #60ae05; background-color: #229607; }
+.input-switch.off { border: 1px solid rgba(255,255,255,.51); background: none; justify-content: flex-start; }
+.input-switch .oval { min-width: 14px; max-width: 14px; height: 14px; box-shadow: inset 0 0 7px #00000029; background-color: #fff; border: solid 2px #a3b98a; border-radius: 50%; }
+.cashout-snipper-wrapper { height: 50%; display: flex; justify-content: center; align-items: center; margin-left: 5px; }
+.cashout-snipper-wrapper .cashout-snipper { height: 30px; width: 80px; display: flex; font-size: 16px; }
+.cashout-snipper-wrapper .cashout-snipper .snipper { height: 100%; display: flex; justify-content: space-between; align-items: center; border-radius: 22px; background-color: #000000b3; font-weight: 700; font-size: inherit; line-height: 1; padding-left: 10px; padding-right: 10px; }
+.cashout-snipper-wrapper .cashout-snipper .snipper.disabled { background-color: #131313b3 !important; }
+.cashout-snipper-wrapper .cashout-snipper .snipper .input { display: flex; align-items: center; width: calc(100% - 10px); height: 100%; }
+.cashout-snipper-wrapper .cashout-snipper .snipper .input input { width: 100%; border: 0; background: transparent; color: #fff; text-align: center; padding: 0; font-weight: 700 !important; outline: none; font-size: 14px; }
+.cashout-snipper-wrapper .cashout-snipper .snipper .text { line-height: 1; color: #fff; opacity: .5; padding: 0; font-size: 16px; }
+
+.info-board { height: 100%; flex-grow: 0; flex-shrink: 0; width: 100%; padding-left: 10px; padding-top: 10px; display: flex; flex-direction: column; position: relative; }
+@media (min-width: 992px) { .info-board { min-width: 320px !important; max-width: 320px !important; } }
+@media (min-width: 1200px) { .info-board { min-width: 370px !important; max-width: 370px !important; } }
+@media (min-width: 1399.98px) { .info-board { min-width: 410px !important; max-width: 410px !important; } }
+.info-board .bets-block { display: flex; flex-direction: column; height: 100%; width: 100%; background: #1B1C1D; border-radius: 10px 10px 0 0; overflow: hidden; }
+.bet-block-nav { min-height: 24px; max-height: 24px; font-size: 12px; margin: 5px 0; display: flex; align-items: center; justify-content: center; }
+.bet-block-nav .navigation-switcher { height: 100%; background: #141516; border-radius: 10px; border: solid 1px #141516; position: relative; display: flex; }
+.bet-block-nav .navigation-switcher .tab { width: 100px; height: 100%; text-align: center; background: none; border: none; color: #9ea0a3; cursor: pointer; padding: 0; font-size: 12px; }
+.bet-block-nav .navigation-switcher .tab.click { background: rgb(44, 45, 48); border-radius: 10px; color: white; }
+.data-list { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.data-list .all-bets-block { font-size: 14px; line-height: 1.2; align-items: center; justify-content: space-between; padding: 0 10px 5px; display: flex; }
+.data-list .all-bets-block .previous-hand { height: 20px; font-size: 12px; padding: 0 8px 0 3px; white-space: nowrap; color: #9ea0a3; border-radius: 17px; border: solid 1px #414148; background-color: #252528; cursor: pointer; display: flex; align-items: center; gap: 3px; }
+.data-list .all-bets-block .previous-hand.click span { color: red; }
+.data-list .all-bets-block .previous-hand .history-i { width: 14px; height: 13px; display: inline-block; }
+.data-list .legend { font-size: 11px; color: #7b7b7b; height: 20px; margin: 0 10px; display: flex; align-items: center; }
+.data-list .legend .user { width: 19%; }
+.data-list .legend .bet { min-width: 35%; padding-right: 10px; text-align: right; white-space: nowrap; }
+.data-list .legend .cash-out { flex: 1; text-align: right; white-space: nowrap; }
+.data-list .bets-scroll { margin: 0; height: 100% !important; overflow-y: auto; }
+.data-list .bets-scroll .bet-item { height: 34px; margin-top: 2px; border-radius: 8px; background-color: #101112; border: solid 1px #101112; font-size: 14px; color: #bbbfc5; display: flex; align-items: center; padding: 0 10px; }
+.data-list .bets-scroll .bet-item.celebrated { border-color: #427f00; background-color: #123405; color: #fff; }
+.data-list .bets-scroll .bet-item .user { width: 19%; display: flex; align-items: center; gap: 5px; }
+.data-list .bets-scroll .bet-item .user .username { font-size: 13px; color: #9ea0a3; }
+.data-list .bets-scroll .bet-item .bet-amount { min-width: 30%; padding-right: 10px; display: flex; justify-content: flex-end; font-size: 13px; }
+.data-list .bets-scroll .bet-item .multiplier-block { display: flex; font-size: 12px; align-items: center; }
+.data-list .bets-scroll .bet-item .multiplier-block .bubble { padding: 2px 11px; border-radius: 11px; color: rgb(52, 180, 255); background-color: #00000080; font-weight: 700; }
+.data-list .bets-scroll .bet-item .cash-out-amount { flex: 1; padding-right: 5px; text-align: right; font-size: 13px; }
+
+.game-container { width: 100%; height: calc(100vh - 24px); display: flex; flex-direction: row; overflow: hidden; max-width: 100vw; }
+@media (min-width: 992px) { .game-play { width: calc(100% - 320px) !important; } }
+@media (min-width: 1200px) { .game-play { width: calc(100% - 370px) !important; } }
+@media (min-width: 1399.98px) { .game-play { width: calc(100% - 410px) !important; } }
+@media (min-width: 992px) { .game-play { flex-shrink: 1; min-width: 0; } }
+@media (max-width: 991.98px) {
+  .game-container { flex-direction: column !important; padding-left: 5px !important; padding-right: 5px !important; height: calc(100vh - 56px - 64px - 10px) !important; min-height: 0 !important; overflow: hidden !important; }
+  .game-play { width: 100% !important; padding: 0 !important; height: auto !important; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .result-history { margin: 6px 0; flex-shrink: 0; }
+  .stage-board { flex: 1; min-height: 180px !important; height: auto !important; }
+  .stage-board .play-board-wrapper { position: absolute; inset: 0; }
+  .bet-controls { padding-top: 6px; flex-shrink: 0; }
+  .bet-controls .controls .bet-control { height: auto; min-height: 130px; max-width: 100%; }
+  .bet-controls .controls .bet-control .controls .first-row { max-width: 100%; }
+  .bet-controls .controls .bet-control .controls .first-row .bet-block { width: 120px; flex-shrink: 0; }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block { width: calc(100% - 125px); }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block button { min-height: 48px; font-size: 16px; }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block button span label.amount { font-size: 20px; }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block button span label.amount .currency { font-size: 14px; }
+  .info-board { height: auto !important; min-height: 200px; max-height: 30vh; padding-left: 0 !important; padding-top: 8px !important; flex-shrink: 0; }
+  .crashtext { font-size: 48px !important; }
+  .crashtext .flew-away { font-size: 20px !important; margin-top: 10px !important; }
+  .rotate { width: 60px !important; height: 60px !important; margin-bottom: 4px !important; }
+  .crashtext .waiting-font { font-size: 16px !important; }
+  .waiting { width: 160px !important; }
+}
+@media (max-width: 634px) {
+  .bet-controls .controls .bet-control .controls .first-row { flex-wrap: wrap; justify-content: center; }
+  .bet-controls .controls .bet-control .controls .first-row .bet-block { width: 100%; }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block { width: 100%; margin-left: 0; margin-top: 4px; }
+  .bet-controls .controls .bet-control .controls .first-row .buttons-block button { min-height: 42px; font-size: 14px; }
+  .bet-controls .controls .bet-control { min-height: 200px; }
+  .bet-controls .controls .bet-control .controls { height: auto; }
+  .crashtext { font-size: 36px !important; }
+  .crashtext .flew-away { font-size: 16px !important; }
+  .rotate { width: 50px !important; height: 50px !important; }
+}
+@media (max-width: 400px) {
+  .game-container { height: calc(100vh - 56px - 64px - 8px) !important; padding-left: 3px !important; padding-right: 3px !important; }
+  .stage-board { min-height: 140px !important; }
+  .bet-controls .controls .bet-control { min-height: 180px; min-width: 0; }
+  .bet-controls .controls .bet-control .controls .navigation .navigation-switcher button { padding: 0 8px; font-size: 11px; }
+  .crashtext { font-size: 28px !important; }
+  .bet-controls .controls .bet-control .controls .first-row .bet-block .bet-opt-list .bet-opt { width: 46px; font-size: 11px; padding: 0 4px; }
+  .bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner .input input { font-size: 13px; }
+  .bet-controls .controls .bet-control .controls .first-row .bet-block .bet-spinner .spinner { padding-left: 6px; padding-right: 6px; }
+}
+
+.dropdown-menu { will-change: transform; position: absolute; transform: translate(-5px, 22px); top: 0; left: 0; background-color: initial; border: unset; margin: -26px 0 0; padding: 0; right: auto; bottom: auto; z-index: 100; float: left; min-width: 10rem; font-size: 1rem; text-align: left; list-style: none; border-radius: 0.25rem; background-clip: padding-box; display: none; }
+.dropdown-menu .wrapper { border-radius: 16px; box-shadow: 0 2px 20px #00000080; background-color: #1f2128; margin: 0 5px; width: 100%; }
+.dropdown-menu .wrapper .header-2 { height: 32px; display: flex; justify-content: flex-start; align-items: center; font-size: 14px; }
+.dropdown-menu .wrapper .header-2 div { margin-left: 10px; text-transform: uppercase; }
+.dropdown-menu .wrapper .payouts-block { background-color: #262830; display: flex; flex-wrap: wrap; padding: 5px; border-radius: 0 0 16px 16px; font-size: 12px; }
+.dropdown-menu .wrapper .payouts-block .payout { margin: 3px; cursor: pointer; }
+.dropdown-menu .wrapper .payouts-block .bubble-multiplier { padding: 3px 11px; border-radius: 11px; background-color: #00000080; font-weight: 700; }
+.dropdown-menu .wrapper .payouts-block .blue { color: rgb(52, 180, 255); }
+.dropdown-menu .wrapper .payouts-block .purple { color: rgb(145, 62, 248); }
+.dropdown-menu .wrapper .payouts-block .big { color: rgb(192, 23, 180); }
+
+.avatar { width: 16px; height: 16px; border-radius: 50%; }
+.spacer { height: 0; }
+
+.history-icon { width: 14px; height: 13px; background: url(./assets/images/history-i.svg) no-repeat center center/contain; margin-right: 5px; pointer-events: none; }
+.dd-icon { width: 10px; height: 10px; transition: transform .5s; background: url(./assets/images/dd.svg) no-repeat center center/contain; pointer-events: none; }
+.dd-icon.up { transform: rotate(180deg); }
+
+.waiting { margin-top: 10px; width: 250px; background-color: rgb(138, 138, 138); border-radius: 8px; overflow: hidden; }
+.waiting div { background-color: rgb(190, 13, 13); padding: 2px 0; border-radius: 8px; transition: width 0.3s ease-in-out; min-width: 0; }
+@media (max-width:560px) { .waiting { width: 200px; } }
+.uppercase { text-transform: uppercase; }
+.ml-1 { margin-left: 0.25rem; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.flex { display: flex; }
+.mt-20 { margin-top: 20px; }
+
+@media (max-width: 1314px) {
+  .crashtext.wait { top: 22%; }
+  .rotate { width: 80px; height: 80px; margin-bottom: 5px; }
+}
+@media (max-width: 560px) {
+  .crashtext .waiting-font { font-size: 18px; width: 200px; }
 }
 
 .graph-line {
@@ -281,6 +484,77 @@ body {
   animation: screenShake 0.5s ease-out;
 }
 
+.opacity-100 { opacity: 1; }
+.opacity-98 { opacity: 0.98; }
+.opacity-96 { opacity: 0.96; }
+.opacity-94 { opacity: 0.94; }
+.opacity-92 { opacity: 0.92; }
+.opacity-90 { opacity: 0.9; }
+.opacity-88 { opacity: 0.88; }
+.opacity-86 { opacity: 0.86; }
+.opacity-84 { opacity: 0.84; }
+.opacity-82 { opacity: 0.82; }
+.opacity-80 { opacity: 0.8; }
+.opacity-78 { opacity: 0.78; }
+.opacity-76 { opacity: 0.76; }
+.opacity-74 { opacity: 0.74; }
+.opacity-72 { opacity: 0.72; }
+.opacity-70 { opacity: 0.7; }
+.opacity-68 { opacity: 0.68; }
+.opacity-66 { opacity: 0.66; }
+.opacity-64 { opacity: 0.64; }
+.opacity-62 { opacity: 0.62; }
+.opacity-60 { opacity: 0.6; }
+.opacity-58 { opacity: 0.58; }
+.opacity-56 { opacity: 0.56; }
+.opacity-54 { opacity: 0.54; }
+.opacity-52 { opacity: 0.52; }
+.opacity-50 { opacity: 0.5; }
+.opacity-48 { opacity: 0.48; }
+.opacity-46 { opacity: 0.46; }
+.opacity-44 { opacity: 0.44; }
+.opacity-42 { opacity: 0.42; }
+.opacity-40 { opacity: 0.4; }
+.opacity-38 { opacity: 0.38; }
+.opacity-36 { opacity: 0.36; }
+.opacity-34 { opacity: 0.34; }
+.opacity-32 { opacity: 0.32; }
+
+.dom-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+.fun-mode { position: absolute; top: 0; left: 0; background: rgba(229, 148, 7, .8); text-align: center; font-size: 14px; font-weight: 700; width: 100%; border-radius: 20px 20px 0 0; border: 1px solid #e59407; color: #fff; pointer-events: auto; }
+
+.sec-hand-btn { position: absolute; right: 10px; top: 10px; width: 24px; height: 24px; padding: 0; cursor: pointer; border-radius: 10px; border: none; z-index: 10; }
+.sec-hand-btn.add { background: #427f00 url(./assets/images/plus-1.svg) no-repeat center center; background-size: 14px; }
+.sec-hand-btn.minus { background: #427f00 url(./assets/images/remove.svg) no-repeat center center; background-size: 14px; }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); }
+.modal-overlay .modal-backdrop { position: absolute; inset: 0; }
+.modal-overlay .modal-dialog { position: relative; background: #1f2128; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,0.5); width: 380px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
+.modal-overlay .modal-dialog .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #2A2B2E; }
+.modal-overlay .modal-dialog .modal-header span { font-size: 16px; font-weight: 700; color: #fff; }
+.modal-overlay .modal-dialog .modal-header .close { background: none; border: none; color: #9ea0a3; cursor: pointer; font-size: 18px; padding: 0; }
+.modal-overlay .modal-dialog .modal-body { padding: 16px 20px; }
+.modal-overlay .modal-dialog .modal-body .content-part { background-color: #2c2d30; border-radius: 10px; padding: 15px 10px; display: flex; align-items: center; margin-bottom: 5px; font-size: 14px; line-height: 14px; justify-content: space-between; }
+.modal-overlay .modal-dialog .modal-body .content-part .title { font-size: 12px; color: #9ea0a3; opacity: .4; margin-right: auto; padding: 0 3px 0 5px; text-align: left; }
+.modal-overlay .modal-dialog .modal-body .content-part .rounds-wrap { display: flex; gap: 6px; }
+.modal-overlay .modal-dialog .modal-body .content-part .rounds-wrap .btn-secondary { height: 24px; min-width: 40px; border-radius: 100px; padding: 0 10px; font-size: 12px; cursor: pointer; border: solid 1px #36363C; color: #83878e; background: #252528; box-shadow: none; }
+.modal-overlay .modal-dialog .modal-body .content-part .rounds-wrap .onClick { color: #fff; background-color: #545b62; border: solid 1px #60ae05; box-shadow: none; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner { display: flex; align-items: center; gap: 4px; background: #000000b3; border-radius: 22px; padding: 2px 8px; height: 26px; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner.disabled { background: #131313b3; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner .buttons button { width: 16px; height: 16px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner .buttons .minus { background: transparent url(./assets/images/minus.svg) no-repeat center center; background-size: 8px; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner .buttons .plus { background: transparent url(./assets/images/plus.svg) no-repeat center center; background-size: 8px; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner.disabled .buttons button { opacity: 0.3; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner .input input { width: 50px; background: transparent; border: none; color: #fff; text-align: center; font-size: 13px; outline: none; }
+.modal-overlay .modal-dialog .modal-body .content-part-1 { flex-direction: column; justify-content: center; padding-bottom: 12px; text-align: center; }
+.modal-overlay .modal-dialog .modal-body .content-part-1 .rounds-wrap { width: 100%; max-width: 290px; display: flex; justify-content: space-evenly; margin-top: 10px; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner.disabled .input input { color: #555; }
+.modal-overlay .modal-dialog .modal-body .content-part .m-spinner .text { color: #9ea0a3; font-size: 12px; }
+.modal-overlay .modal-dialog .modal-footer { background: #2C2D30; padding: 10px; border-top: 1px solid #2A2B2E; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.modal-overlay .modal-dialog .modal-footer .btns-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; gap: 8px; }
+.modal-overlay .modal-dialog .modal-footer .btns-wrapper .reset-btn { min-width: 80px; height: 22px; padding: 0; border-radius: 20px; font-size: 12px; cursor: pointer; border: none; color: #fff; }
+.modal-overlay .modal-dialog .modal-footer .btns-wrapper .start-btn { width: 160px; height: 30px; padding: 0; border-radius: 20px; font-size: 1.25rem; cursor: pointer; border: none; color: #fff; }
+
 @keyframes screenShake {
   0%, 100% { transform: translate(0, 0); }
   10% { transform: translate(-3px, 2px); }
@@ -292,4 +566,25 @@ body {
   70% { transform: translate(-2px, -1px); }
   80% { transform: translate(3px, 1px); }
   90% { transform: translate(-1px, 2px); }
+}
+
+.sound-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+.sound-toggle:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
 }

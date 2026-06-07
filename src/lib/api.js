@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_URL || '/api';
+if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://') && !baseURL.startsWith('/')) {
+  console.warn(`[API] VITE_API_URL "${baseURL}" is not a valid URL or path. Falling back to "/api".`);
+}
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   headers: { 'Content-Type': 'application/json' }
 });
 
