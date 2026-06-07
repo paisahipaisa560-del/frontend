@@ -1,5 +1,5 @@
 {
-  "buildCommand": "chmod -R +x node_modules/.bin && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
