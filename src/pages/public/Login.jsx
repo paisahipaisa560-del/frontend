@@ -35,7 +35,11 @@ export default function Login() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-sm">
-        <div className="glass-card rounded-2xl p-6 neon-border">
+        <div className="glass-card rounded-2xl p-6 neon-border relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-10">
+            <img src="/login bg.png" alt="" className="w-full h-full object-cover" />
+          </div>
+          <div className="relative z-10">
           <div className="text-center mb-6">
             <img src="/brand-logo.png" alt="Paisa Hi Paisa" className="h-12 mx-auto mb-3" />
             <p className="text-gray-600 text-xs mt-1.5">Sign in to your account</p>
@@ -64,6 +68,7 @@ export default function Login() {
 
           <div className="mt-5 pt-4 border-t border-white/5 text-center">
             <p className="text-gray-700 text-[10px] tracking-wider uppercase">Play Smart. Win Big. Fly High.</p>
+          </div>
           </div>
         </div>
       </motion.div>
