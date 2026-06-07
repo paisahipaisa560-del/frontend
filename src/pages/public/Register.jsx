@@ -47,7 +47,7 @@ export default function Register() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-sm">
         <div className="glass-card rounded-2xl p-6 neon-border relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-10">
+          <div className="absolute inset-0 pointer-events-none opacity-40">
             <img src="/login bg.png" alt="" className="w-full h-full object-cover" />
           </div>
           <div className="relative z-10">
