@@ -36,10 +36,12 @@ export default function Login() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-sm">
         <div className="glass-card rounded-2xl p-6 neon-border">
-          <div className="text-center mb-5">
-            <Flame size={28} className="text-neon-green mx-auto mb-2" />
-            <h1 className="font-orbitron text-neon-green text-lg font-bold neon-text">PHP</h1>
-            <p className="text-gray-500 text-xs mt-1">Welcome back to Paisa Hi Paisa</p>
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-neon-green/10 flex items-center justify-center mx-auto mb-3 border border-neon-green/20">
+              <Flame size={28} className="text-neon-green drop-shadow-[0_0_10px_rgba(57,255,20,0.3)]" />
+            </div>
+            <h1 className="font-orbitron text-neon-green text-xl font-bold neon-text tracking-wider">Paisa Hi Paisa</h1>
+            <p className="text-gray-600 text-xs mt-1.5">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -61,6 +63,10 @@ export default function Login() {
           <div className="flex items-center justify-between mt-4 text-xs">
             <Link to="/register" className="text-neon-green hover:underline">Create account</Link>
             <Link to="/forgot-password" className="text-gray-500 hover:text-white">Forgot password?</Link>
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-white/5 text-center">
+            <p className="text-gray-700 text-[10px] tracking-wider uppercase">Play Smart. Win Big. Fly High.</p>
           </div>
         </div>
       </motion.div>
