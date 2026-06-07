@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PiggyBank, Clock, CheckCircle2, XCircle, Copy, Check, QrCode, Hash, ArrowLeft, IndianRupee } from 'lucide-react';
+import { PiggyBank, Clock, CheckCircle2, XCircle, Copy, Check, QrCode, Hash, ArrowLeft, IndianRupee, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import { FormSkeleton } from '../../components/ui/Skeleton';
@@ -126,7 +126,13 @@ export default function Deposit() {
                       <span className="text-white text-xs font-bold uppercase tracking-wider">Scan & Pay</span>
                     </div>
                     {qrDataUrl ? (
-                      <img src={qrDataUrl} alt="UPI QR Code" className="mx-auto rounded-xl" style={{ width: 170, height: 170 }} />
+                      <div className="relative inline-block">
+                        <img src={qrDataUrl} alt="UPI QR Code" className="mx-auto rounded-xl" style={{ width: 170, height: 170 }} />
+                        <a href={qrDataUrl} download={`qr-${payment?.upi_id || 'upi'}.png`}
+                          className="absolute -top-2 -right-2 btn-dark p-1.5 rounded-lg text-[10px] flex items-center gap-1">
+                          <Download size={12} /> Save
+                        </a>
+                      </div>
                     ) : (
                       <div className="w-[170px] h-[170px] mx-auto skeleton rounded-xl" />
                     )}
