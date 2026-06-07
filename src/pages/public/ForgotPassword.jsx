@@ -20,7 +20,7 @@ export default function ForgotPassword() {
     try {
       const { data } = await api.post('/auth/forgot-password', { email });
       if (data.success) {
-        toast.success(`OTP sent: ${data.data.otp}`);
+        toast.success('OTP sent to your email');
         setStep(2);
       } else toast.error(data.message);
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
