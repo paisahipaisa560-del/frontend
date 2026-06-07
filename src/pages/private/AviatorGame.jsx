@@ -973,7 +973,7 @@ export default function AviatorGame() {
         <div className="flex items-center gap-1 overflow-x-auto max-w-[55vw] sm:max-w-none scrollbar-none">
           {roundHistory.map((r, i) => {
             const m = typeof r.crashMultiplier === 'number' ? r.crashMultiplier : parseFloat(r.crashMultiplier || r);
-            const colorClass = m >= 10 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20' : m >= 2 ? 'bg-green-500/20 text-green-400 border-green-500/20' : 'bg-red-500/20 text-red-400 border-red-500/20';
+            const colorClass = 'bg-green-500/20 text-green-400 border-green-500/20';
             return (
               <motion.span key={r.id || i} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: i * 0.03 }}
                 className={`text-[9px] sm:text-[10px] font-orbitron px-1.5 py-0.5 rounded border whitespace-nowrap ${colorClass}`}>
