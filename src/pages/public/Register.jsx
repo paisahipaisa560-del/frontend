@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Flame, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Register() {
@@ -40,18 +40,15 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-neon-green/[0.03] blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-neon-green/[0.02] blur-[100px]" />
+        <img src="/authbg.webp" alt="" className="w-full h-full object-cover opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/80" />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-sm">
         <div className="glass-card rounded-2xl p-6 neon-border">
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-neon-green/10 flex items-center justify-center mx-auto mb-3 border border-neon-green/20">
-              <Flame size={28} className="text-neon-green drop-shadow-[0_0_10px_rgba(57,255,20,0.3)]" />
-            </div>
-            <h1 className="font-orbitron text-neon-green text-xl font-bold neon-text tracking-wider">Paisa Hi Paisa</h1>
+            <img src="/brand-logo.png" alt="Paisa Hi Paisa" className="h-12 mx-auto mb-3" />
             <p className="text-gray-600 text-xs mt-1.5">Create your account to start playing</p>
           </div>
 
