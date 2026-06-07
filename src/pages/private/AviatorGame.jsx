@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, History, DollarSign, Clock, Volume2, VolumeX, Users, Zap } from 'lucide-react';
+import { TrendingUp, History, DollarSign, Clock, Volume2, VolumeX, Users, Zap, Trophy, Flame, Sparkles, Bomb, Frown, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
@@ -377,7 +377,7 @@ function generateFakeActivity(multiplier, state) {
   const idx = Math.floor(Math.random() * FAKE_NAMES.length);
   const name = FAKE_NAMES[idx];
   const avatarColor = FAKE_AVATARS[idx];
-  const amt = Math.round(rand(100, 5000));
+  const amt = Math.round(rand(100, 10000));
   const avatarUrl = `https://api.dicebear.com/7.x/identicon/png?seed=${name}&size=16`;
   if (state === 'flying') {
     const cashMult = parseFloat((1 + rand(0.1, Math.max(0.5, multiplier - 0.5))).toFixed(2));
@@ -385,10 +385,14 @@ function generateFakeActivity(multiplier, state) {
     const actions = [
       { avatarUrl, name, text: `cashed out at ${cashMult.toFixed(2)}x & won ₹${win.toLocaleString('en-IN')}`, type: 'win', avatarColor },
       { avatarUrl, name, text: `bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet', avatarColor },
+      { avatarUrl, name, text: `waiting for ${multiplier.toFixed(2)}x`, type: 'bet', avatarColor },
     ];
     return { ...pick(actions), id: ++fakeActivityId };
   }
   if (state === 'crashed') {
+    if (multiplier >= 5) {
+      return { avatarUrl, name, text: `lost ₹${amt.toLocaleString('en-IN')} at ${multiplier.toFixed(2)}x`, type: 'loss', avatarColor, id: ++fakeActivityId };
+    }
     return { avatarUrl, name, text: `lost ₹${amt.toLocaleString('en-IN')}`, type: 'loss', avatarColor, id: ++fakeActivityId };
   }
   return { avatarUrl, name, text: `bet ₹${amt.toLocaleString('en-IN')}`, type: 'bet', avatarColor, id: ++fakeActivityId };
@@ -421,6 +425,7 @@ export default function AviatorGame() {
   const [winPopupAmount, setWinPopupAmount] = useState(null);
   const [userBets, setUserBets] = useState([]);
   const [fakeActivity, setFakeActivity] = useState([]);
+  const [bigWins, setBigWins] = useState([]);
   const [bet, setBet] = useState({ amount: '', autoCashout: '', betId: null, status: 'idle', payout: null, cashoutMultiplier: null });
   const [countdown, setCountdown] = useState(0);
 
@@ -432,6 +437,7 @@ export default function AviatorGame() {
   const displayedMultiplierRef = useRef(1.0);
   const thrustRef = useRef(1);
   const fakeTimerRef = useRef(null);
+  const lastFakeWinRef = useRef('');
 
   useEffect(() => { gameStateRef.current = gameState; }, [gameState]);
   useEffect(() => { pointsRef.current = points; }, [points]);
@@ -631,6 +637,24 @@ export default function AviatorGame() {
       }
       if (gs.history) setRoundHistory(gs.history.slice(-12));
       if (gs.recentBets) setUserBets(gs.recentBets);
+      if (gs.fakeWins && gs.fakeWins.length > 0) {
+        const key = JSON.stringify(gs.fakeWins);
+        if (key !== lastFakeWinRef.current) {
+          lastFakeWinRef.current = key;
+          setBigWins(gs.fakeWins);
+          if (gs.fakeWins[0].multiplier >= 25) {
+            confettiRef.current?.burst(60);
+          }
+          const winItems = gs.fakeWins.map(w => ({
+            id: Date.now() + Math.random(),
+            avatarUrl: `https://api.dicebear.com/7.x/identicon/png?seed=${w.name}&size=16`,
+            name: w.name,
+            text: `won ₹${w.amount.toLocaleString('en-IN')} at ${w.multiplier.toFixed(2)}x!`,
+            type: 'win'
+          }));
+          setFakeActivity(prev => [...winItems, ...prev].slice(0, 3));
+        }
+      }
     } catch {}
   };
 
@@ -830,7 +854,9 @@ export default function AviatorGame() {
       }
 
       // Draw the curve line with bezier
-      const lineColor = gameState === 'crashed' ? '#ff3333' : getColor(displayedMultiplierRef.current);
+      const m = displayedMultiplierRef.current;
+      const lineColor = gameState === 'crashed' ? '#ff3333' : m >= 50 ? '#FFD700' : m >= 25 ? '#6BCBFF' : m >= 10 ? '#FFD700' : m >= 5 ? '#FF8C00' : getColor(m);
+      const glowIntensity = gameState === 'crashed' ? 6 : m >= 50 ? 35 : m >= 25 ? 28 : m >= 10 ? 22 : m >= 5 ? 18 : 14;
       ctx.beginPath();
       ctx.moveTo(mapX(pts[0].t), mapY(pts[0].m));
       for (let i = 1; i < pts.length - 1; i++) {
@@ -840,9 +866,9 @@ export default function AviatorGame() {
       }
       ctx.lineTo(mapX(pts[pts.length - 1].t), mapY(pts[pts.length - 1].m));
       ctx.strokeStyle = lineColor;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = m >= 25 ? 3.5 : 2.5;
       ctx.shadowColor = lineColor;
-      ctx.shadowBlur = gameState === 'crashed' ? 6 : 14;
+      ctx.shadowBlur = glowIntensity;
       ctx.stroke();
       ctx.shadowBlur = 0;
 
@@ -891,13 +917,16 @@ export default function AviatorGame() {
         const planeScale = Math.min(w, h) / 260;
 
         // Glow aura
-        const glow = ctx.createRadialGradient(lx, ly, 0, lx, ly, 25 * planeScale);
-        const gc = getColor(displayedMultiplierRef.current);
-        glow.addColorStop(0, gc.replace(')', ',0.12)'));
+        const m = displayedMultiplierRef.current;
+        const glowRadius = m >= 50 ? 50 * planeScale : m >= 25 ? 40 * planeScale : m >= 10 ? 35 * planeScale : 25 * planeScale;
+        const glow = ctx.createRadialGradient(lx, ly, 0, lx, ly, glowRadius);
+        const gc = m >= 50 ? '#FFD700' : m >= 25 ? '#6BCBFF' : m >= 10 ? '#FFD700' : getColor(m);
+        const glowAlpha = m >= 50 ? 0.3 : m >= 25 ? 0.25 : m >= 10 ? 0.18 : 0.12;
+        glow.addColorStop(0, gc.replace(')', `,${glowAlpha})`));
         glow.addColorStop(1, gc.replace(')', ',0)'));
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(lx, ly, 25 * planeScale, 0, Math.PI * 2);
+        ctx.arc(lx, ly, glowRadius, 0, Math.PI * 2);
         ctx.fill();
 
         drawPlane(ctx, lx, ly, angle, planeScale, thrustRef.current);
@@ -1005,28 +1034,58 @@ export default function AviatorGame() {
                         {countdown > 0 ? `NEXT ROUND IN ${countdown}s` : 'PREPARE FOR TAKEOFF'}
                       </motion.p>
                     </motion.div>
-                  ) : gameState === 'flying' ? (
+                    ) : gameState === 'flying' ? (
                     <motion.div key="flying" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                       <motion.p
-                        animate={{ scale: displayedMultiplier > 5 ? [1, 1.02, 1] : 1 }}
-                        transition={{ duration: 0.5, repeat: displayedMultiplier > 5 ? Infinity : 0 }}
+                        animate={{
+                          scale: displayedMultiplier > 5 ? [1, 1.02, 1] : 1,
+                          textShadow: displayedMultiplier >= 50
+                            ? ['0 0 40px rgba(255,215,0,0.8)', '0 0 80px rgba(255,215,0,1)', '0 0 40px rgba(255,215,0,0.8)']
+                            : displayedMultiplier >= 25
+                            ? ['0 0 30px rgba(100,200,255,0.6)', '0 0 60px rgba(100,200,255,0.9)', '0 0 30px rgba(100,200,255,0.6)']
+                            : displayedMultiplier >= 10
+                            ? ['0 0 15px rgba(255,215,0,0.3)', '0 0 25px rgba(255,215,0,0.5)', '0 0 15px rgba(255,215,0,0.3)']
+                            : ['0 0 10px rgba(57,255,20,0.2)']
+                        }}
+                        transition={{ duration: 0.4, repeat: displayedMultiplier >= 10 ? Infinity : 0 }}
                         className={`font-orbitron text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold transition-colors duration-200 ${
-                          displayedMultiplier >= 10
-                            ? 'text-yellow-400 drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]'
+                          displayedMultiplier >= 50
+                            ? 'text-yellow-300'
+                            : displayedMultiplier >= 25
+                            ? 'text-cyan-300'
+                            : displayedMultiplier >= 10
+                            ? 'text-yellow-400'
                             : displayedMultiplier >= 5
-                            ? 'text-orange-400 drop-shadow-[0_0_12px_rgba(255,140,0,0.25)]'
+                            ? 'text-orange-400'
                             : displayedMultiplier >= 2
-                            ? 'text-green-300 drop-shadow-[0_0_10px_rgba(127,255,0,0.2)]'
+                            ? 'text-green-300'
                             : 'neon-text multiplier-display'
-                        }`}>
+                        }`}
+                      >
                         {displayedMultiplier.toFixed(2)}
                         <span className="text-xl sm:text-2xl md:text-3xl">x</span>
                       </motion.p>
                       <motion.p
                         animate={{ opacity: [0.2, 0.5, 0.2] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
-                        className="text-gray-600 text-[8px] font-orbitron mt-0.5 tracking-widest uppercase"
-                      >In Flight</motion.p>
+                        className={`text-[8px] font-orbitron mt-0.5 tracking-widest uppercase ${
+                          displayedMultiplier >= 50
+                            ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]'
+                            : displayedMultiplier >= 25
+                            ? 'text-cyan-400 drop-shadow-[0_0_10px_rgba(100,200,255,0.5)]'
+                            : displayedMultiplier >= 10
+                            ? 'text-yellow-500'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        <span className="flex items-center gap-1 justify-center">
+  {displayedMultiplier >= 50 && <Sparkles size={12} className="text-yellow-400" />}
+  {displayedMultiplier >= 25 && <Zap size={12} className="text-cyan-400" />}
+  <span>{displayedMultiplier >= 50 ? 'LEGENDARY!' : displayedMultiplier >= 25 ? 'MEGA!' : displayedMultiplier >= 10 ? 'GOLDEN!' : 'In Flight'}</span>
+  {displayedMultiplier >= 50 && <Sparkles size={12} className="text-yellow-400" />}
+  {displayedMultiplier >= 25 && <Zap size={12} className="text-cyan-400" />}
+</span>
+                      </motion.p>
                     </motion.div>
                   ) : (
                     <motion.div key="crashed" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
@@ -1059,11 +1118,15 @@ export default function AviatorGame() {
             </div>
             <div className="h-[60px] sm:h-[70px] overflow-hidden">
               {fakeActivity.map((a, i) => (
-                <div
+                <motion.div
                   key={a.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
                   className={`flex items-center gap-1 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md mb-0.5 truncate ${
                     a.type === 'win'
-                      ? 'bg-green-500/5 text-green-300'
+                      ? currentMultiplier >= 10
+                        ? 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/10'
+                        : 'bg-green-500/5 text-green-300'
                       : a.type === 'loss'
                       ? 'bg-red-500/5 text-red-300'
                       : 'bg-white/5 text-gray-400'
@@ -1072,7 +1135,7 @@ export default function AviatorGame() {
                   <img src={a.avatarUrl} alt="" className="w-3.5 h-3.5 rounded-full shrink-0" />
                   <span className="font-semibold shrink-0">{a.name}</span>
                   <span className="truncate">{a.text}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -1237,14 +1300,43 @@ export default function AviatorGame() {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-[#0a0a0a] border border-green-500/20 rounded-2xl px-8 py-6 text-center shadow-[0_0_60px_rgba(57,255,20,0.1)] max-w-sm mx-4 pointer-events-auto">
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 0.5, repeat: 2 }} className="text-5xl mb-3">🎉</motion.div>
-              <h2 className="font-orbitron text-lg font-bold text-green-400 mb-1">Hooray! You Won!</h2>
-              <p className="font-orbitron text-3xl font-bold neon-text mb-3">
+            <div className={`rounded-2xl px-8 py-6 text-center max-w-sm mx-4 pointer-events-auto ${
+              displayedMultiplier >= 10
+                ? 'bg-[#1a1500] border border-yellow-500/30 shadow-[0_0_80px_rgba(255,215,0,0.15)]'
+                : 'bg-[#0a0a0a] border border-green-500/20 shadow-[0_0_60px_rgba(57,255,20,0.1)]'
+            }`}>
+              <motion.div animate={displayedMultiplier >= 10
+                ? { rotate: [0, -10, 10, -10, 0], scale: [1, 1.1, 1] }
+                : { y: [0, -8, 0] }}
+                transition={{ duration: 0.6, repeat: displayedMultiplier >= 10 ? 2 : 2 }}
+                className="text-5xl mb-3"
+              >
+                <div className="flex items-center justify-center gap-1">
+                  {displayedMultiplier >= 50 ? (
+                    <><Trophy size={32} className="text-yellow-400" /><Sparkles size={20} className="text-yellow-300" /></>
+                  ) : displayedMultiplier >= 25 ? (
+                    <><Star size={32} className="text-cyan-400" /><Zap size={20} className="text-cyan-300" /></>
+                  ) : displayedMultiplier >= 10 ? (
+                    <Flame size={32} className="text-orange-500" />
+                  ) : (
+                    <Sparkles size={32} className="text-green-400" />
+                  )}
+                </div>
+              </motion.div>
+              <h2 className={`font-orbitron text-lg font-bold mb-1 ${
+                displayedMultiplier >= 10 ? 'text-yellow-400' : 'text-green-400'
+              }`}>
+                {displayedMultiplier >= 50 ? 'LEGENDARY WIN!' : displayedMultiplier >= 25 ? 'MEGA WIN!' : displayedMultiplier >= 10 ? 'GOLDEN WIN!' : 'Hooray! You Won!'}
+              </h2>
+              <p className={`font-orbitron text-3xl font-bold mb-3 ${
+                displayedMultiplier >= 10 ? 'text-yellow-300 drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'neon-text'
+              }`}>
                 +{'\u20B9'}{winPopupAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
-              <p className="text-gray-500 text-xs">Okay, try once more!</p>
-              <motion.div animate={{ width: ['0%', '100%'] }} transition={{ duration: 4, ease: 'linear' }} className="h-0.5 bg-green-500/30 rounded-full mt-4 mx-auto" />
+              <p className="text-gray-500 text-xs">{displayedMultiplier >= 10 ? 'Incredible! Keep it up!' : 'Okay, try once more!'}</p>
+              <motion.div animate={{ width: ['0%', '100%'] }} transition={{ duration: 4, ease: 'linear' }} className={`h-0.5 rounded-full mt-4 mx-auto ${
+                displayedMultiplier >= 10 ? 'bg-yellow-500/30' : 'bg-green-500/30'
+              }`} />
             </div>
           </motion.div>
         )}
@@ -1259,12 +1351,45 @@ export default function AviatorGame() {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-[#0a0a0a] border border-red-500/20 rounded-2xl px-8 py-6 text-center shadow-[0_0_60px_rgba(255,0,0,0.15)] max-w-sm mx-4 pointer-events-auto">
-              <motion.div animate={{ rotate: [0, -5, 5, -5, 0] }} transition={{ duration: 0.4 }} className="text-5xl mb-3">💥</motion.div>
-              <h2 className="font-orbitron text-lg font-bold text-red-400 mb-1">Oh no! Crashed!</h2>
-              <p className="font-orbitron text-3xl font-bold text-red-500 mb-2">{popupMultiplier.toFixed(2)}<span className="text-lg">x</span></p>
-              <p className="text-gray-500 text-xs">Please try again next round</p>
-              <motion.div animate={{ width: ['0%', '100%'] }} transition={{ duration: 4, ease: 'linear' }} className="h-0.5 bg-red-500/30 rounded-full mt-4 mx-auto" />
+            <div className={`rounded-2xl px-8 py-6 text-center max-w-sm mx-4 pointer-events-auto ${
+              popupMultiplier >= 25
+                ? 'bg-[#0a1a2a] border border-cyan-500/30 shadow-[0_0_80px_rgba(100,200,255,0.15)]'
+                : popupMultiplier >= 10
+                ? 'bg-[#1a1500] border border-yellow-500/30 shadow-[0_0_80px_rgba(255,215,0,0.15)]'
+                : 'bg-[#0a0a0a] border border-red-500/20 shadow-[0_0_60px_rgba(255,0,0,0.15)]'
+            }`}>
+              <motion.div animate={popupMultiplier >= 25
+                ? { scale: [1, 1.2, 1], rotate: [0, 360] }
+                : { rotate: [0, -5, 5, -5, 0] }}
+                transition={{ duration: popupMultiplier >= 25 ? 1 : 0.4 }}
+                className="text-5xl mb-3"
+              >
+                <div className="flex items-center justify-center gap-1">
+                  {popupMultiplier >= 50 ? (
+                    <><Bomb size={32} className="text-red-400" /><Zap size={20} className="text-yellow-400" /></>
+                  ) : popupMultiplier >= 25 ? (
+                    <Zap size={32} className="text-cyan-400" />
+                  ) : popupMultiplier >= 10 ? (
+                    <Flame size={32} className="text-orange-500" />
+                  ) : (
+                    <Bomb size={32} className="text-red-500" />
+                  )}
+                </div>
+              </motion.div>
+              <h2 className={`font-orbitron text-lg font-bold mb-1 ${
+                popupMultiplier >= 25 ? 'text-cyan-400' : popupMultiplier >= 10 ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {popupMultiplier >= 50 ? 'EPIC CRASH!' : popupMultiplier >= 25 ? 'MEGA CRASH!' : popupMultiplier >= 10 ? 'GOLDEN CRASH!' : 'Oh no! Crashed!'}
+              </h2>
+              <p className={`font-orbitron text-3xl font-bold mb-2 ${
+                popupMultiplier >= 25 ? 'text-cyan-300 drop-shadow-[0_0_20px_rgba(100,200,255,0.3)]' : popupMultiplier >= 10 ? 'text-yellow-300 drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]' : 'text-red-500'
+              }`}>
+                {popupMultiplier.toFixed(2)}<span className="text-lg">x</span>
+              </p>
+              <p className="text-gray-500 text-xs">{popupMultiplier >= 25 ? 'Did anyone cash out?!' : 'Please try again next round'}</p>
+              <motion.div animate={{ width: ['0%', '100%'] }} transition={{ duration: 4, ease: 'linear' }} className={`h-0.5 rounded-full mt-4 mx-auto ${
+                popupMultiplier >= 25 ? 'bg-cyan-500/30' : popupMultiplier >= 10 ? 'bg-yellow-500/30' : 'bg-red-500/30'
+              }`} />
             </div>
           </motion.div>
         )}

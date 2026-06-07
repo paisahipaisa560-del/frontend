@@ -7,6 +7,9 @@ export default function AdminSettings() {
   const [payment, setPayment] = useState({ upiId: '', qrCode: '' });
   const [bonus, setBonus] = useState(50);
   const [speed, setSpeed] = useState(0.015);
+  const [rtp, setRtp] = useState(94);
+  const [lowCrashFreq, setLowCrashFreq] = useState(25);
+  const [highMultFreq, setHighMultFreq] = useState(2);
   const [support, setSupport] = useState({ telegram: '', whatsapp: '' });
   const [loading, setLoading] = useState({ payment: false, bonus: false, game: false, support: false });
 
@@ -17,8 +20,11 @@ export default function AdminSettings() {
       }
     }).catch(() => {});
     api.get('/admin/game-settings').then(({ data }) => {
-      if (data.success && data.data && typeof data.data.speed === 'number') {
-        setSpeed(data.data.speed);
+      if (data.success && data.data) {
+        if (typeof data.data.speed === 'number') setSpeed(data.data.speed);
+        if (typeof data.data.rtp === 'number') setRtp(data.data.rtp);
+        if (typeof data.data.lowCrashFrequency === 'number') setLowCrashFreq(data.data.lowCrashFrequency);
+        if (typeof data.data.highMultiplierFrequency === 'number') setHighMultFreq(data.data.highMultiplierFrequency);
       }
     }).catch(() => {});
     api.get('/support').then(({ data }) => {
@@ -63,16 +69,26 @@ export default function AdminSettings() {
 
   const saveGame = async (e) => {
     e.preventDefault();
-    const parsed = parseFloat(speed);
-    if (isNaN(parsed) || parsed < 0) return toast.error('Enter a valid non-negative speed');
+    const parsedSpeed = parseFloat(speed);
+    if (isNaN(parsedSpeed) || parsedSpeed < 0) return toast.error('Enter a valid non-negative speed');
     setLoading(p => ({ ...p, game: true }));
     try {
-      const { data } = await api.put('/admin/game-settings', { speed: parsed });
+      const { data } = await api.put('/admin/game-settings', {
+        speed: parsedSpeed,
+        rtp: parseFloat(rtp),
+        lowCrashFrequency: parseFloat(lowCrashFreq),
+        highMultiplierFrequency: parseFloat(highMultFreq)
+      });
       if (data.success) {
-        if (data.data && typeof data.data.speed === 'number') setSpeed(data.data.speed);
-        toast.success('Game speed updated!');
+        if (data.data) {
+          if (typeof data.data.speed === 'number') setSpeed(data.data.speed);
+          if (typeof data.data.rtp === 'number') setRtp(data.data.rtp);
+          if (typeof data.data.lowCrashFrequency === 'number') setLowCrashFreq(data.data.lowCrashFrequency);
+          if (typeof data.data.highMultiplierFrequency === 'number') setHighMultFreq(data.data.highMultiplierFrequency);
+        }
+        toast.success('Game settings updated!');
       } else toast.error(data.message);
-    } catch { toast.error('Failed to save game speed'); }
+    } catch { toast.error('Failed to save game settings'); }
     finally { setLoading(p => ({ ...p, game: false })); }
   };
 
@@ -125,12 +141,33 @@ export default function AdminSettings() {
             <h3 className="text-white text-xs font-bold uppercase tracking-wider">Game Speed</h3>
           </div>
           <form onSubmit={saveGame} className="space-y-2">
-            <input type="number" value={speed} onChange={e => setSpeed(e.target.value)} step="0.001"
-              placeholder="Speed (0.01-0.05)" className="input-neon rounded-lg px-3 py-2.5 text-xs" />
-            <p className="text-gray-600 text-[10px]">Higher = faster multiplier increase</p>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Speed</label>
+              <input type="number" value={speed} onChange={e => setSpeed(e.target.value)} step="0.001"
+                placeholder="Speed (0.01-0.05)" className="input-neon rounded-lg px-3 py-2.5 text-xs w-full" />
+              <p className="text-gray-600 text-[10px]">Higher = faster multiplier increase</p>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">RTP % (80-99)</label>
+              <input type="number" value={rtp} onChange={e => setRtp(e.target.value)} step="0.5" min="80" max="99"
+                className="input-neon rounded-lg px-3 py-2.5 text-xs w-full" />
+              <p className="text-gray-600 text-[10px]">Default 94%. Higher = more payouts to players</p>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Low Crash Freq % (5-50)</label>
+              <input type="number" value={lowCrashFreq} onChange={e => setLowCrashFreq(e.target.value)} step="1" min="5" max="50"
+                className="input-neon rounded-lg px-3 py-2.5 text-xs w-full" />
+              <p className="text-gray-600 text-[10px]">Default 25%. Higher = more crashes under 2x</p>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">High Mult Freq % (0.5-10)</label>
+              <input type="number" value={highMultFreq} onChange={e => setHighMultFreq(e.target.value)} step="0.5" min="0.5" max="10"
+                className="input-neon rounded-lg px-3 py-2.5 text-xs w-full" />
+              <p className="text-gray-600 text-[10px]">Default 2%. Higher = more 50x+ rounds</p>
+            </div>
             <button type="submit" disabled={loading.game}
               className="btn-neon w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
-              <Save size={13} /> {loading.game ? 'Saving...' : 'Save Speed'}
+              <Save size={13} /> {loading.game ? 'Saving...' : 'Save Settings'}
             </button>
           </form>
         </div>
