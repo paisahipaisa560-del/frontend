@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiggyBank, Clock, CheckCircle2, XCircle, Copy, Check, QrCode, Hash, ArrowLeft, IndianRupee } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
 import { FormSkeleton } from '../../components/ui/Skeleton';
+import QRCode from 'qrcode';
 
 export default function Deposit() {
   const [step, setStep] = useState('amount');
@@ -13,7 +14,7 @@ export default function Deposit() {
   const [deposits, setDeposits] = useState([]);
   const [payment, setPayment] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [qrLoaded, setQrLoaded] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,9 +24,16 @@ export default function Deposit() {
     ]).finally(() => setLoading(false));
   }, []);
 
-  const qrUrl = payment?.upi_id
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${encodeURIComponent(payment.upi_id)}&pn=Paisa%20Hi%20Paisa&cu=INR`
-    : '';
+  useEffect(() => {
+    if (payment?.upi_id) {
+      const upiLink = `upi://pay?pa=${encodeURIComponent(payment.upi_id)}&pn=Paisa%20Hi%20Paisa&cu=INR`;
+      QRCode.toDataURL(upiLink, {
+        width: 300,
+        margin: 1,
+        color: { dark: '#00ff88', light: '#0a0a0a' }
+      }).then(setQrDataUrl).catch(() => {});
+    }
+  }, [payment]);
 
   const handleProceed = () => {
     const amt = parseFloat(amount);
@@ -117,11 +125,11 @@ export default function Deposit() {
                       <QrCode size={16} className="text-neon-green" />
                       <span className="text-white text-xs font-bold uppercase tracking-wider">Scan & Pay</span>
                     </div>
-                    {!qrLoaded && <div className="w-[160px] h-[160px] mx-auto skeleton rounded-xl" />}
-                    <img src={qrUrl} alt="UPI QR Code"
-                      onLoad={() => setQrLoaded(true)}
-                      className={`mx-auto rounded-xl ${qrLoaded ? 'block' : 'hidden'}`}
-                      style={{ width: 160, height: 160 }} />
+                    {qrDataUrl ? (
+                      <img src={qrDataUrl} alt="UPI QR Code" className="mx-auto rounded-xl" style={{ width: 170, height: 170 }} />
+                    ) : (
+                      <div className="w-[170px] h-[170px] mx-auto skeleton rounded-xl" />
+                    )}
                     <div className="flex items-center gap-2 mt-3 justify-center">
                       <code className="font-orbitron text-neon-green text-xs bg-neon-green/5 rounded-lg px-3 py-1.5 border border-neon-green/10">
                         {payment.upi_id}
